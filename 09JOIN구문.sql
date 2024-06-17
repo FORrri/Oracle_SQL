@@ -50,13 +50,19 @@ SELECT * FROM INFO I FULL JOIN AUTH A ON I.AUTH_ID = A.AUTH_ID;
 SELECT * FROM INFO I CROSS JOIN AUTH A;
 
 --------------------------------------------------------------------------------
---SELF JOIN (하나의 테이블을 가지고 조인을 거는것 - 조건: 연결가능한 KEY 가져야함 / 재귀함수)
+--SELF JOIN (하나의 테이블을 가지고 조인을 거는것 - 조건: 연결가능한 KEY 가져야함 / 재귀함수 / 설계가 잘 되어있어야함)
 SELECT * FROM EMPLOYEES;
 
 SELECT * 
 FROM EMPLOYEES E
 LEFT JOIN EMPLOYEES E2
 ON E.MANAGER_ID = E2.EMPLOYEE_ID;
+
+SELECT * 
+FROM EMPLOYEES E
+LEFT JOIN EMPLOYEES E2
+ON E.EMPLOYEE_ID = E2.MANAGER_ID;
+
 
 --------------------------------------------------------------------------------
 --오라클 조인 - 오라클에서만 사용할 수 있고, 조인할 테이블을 FROM에 씁니다. 조인조건을 WHERE에 씁니다.
@@ -69,7 +75,7 @@ WHERE i.auth_id = a.auth_id;
 --오라클 LEFT JOIN
 SELECT *
 FROM INFO I, AUTH A
-WHERE i.auth_id = a.auth_id(+); --붙일 테이블에 +
+WHERE i.auth_id = a.auth_id(+); --붙일 테이블에 +(오른쪽을 붙인다)
 
 --오라클 RIGHT JOIN
 SELECT *
@@ -99,36 +105,7 @@ LEFT JOIN DEPARTMENTS D ON E.DEPARTMENT_ID = D.DEPARTMENT_ID
 LEFT JOIN LOCATIONS L ON D.LOCATION_ID = L.LOCATION_ID
 WHERE EMPLOYEE_ID >= 150;
 
---일반적으로 N테이블에 1테이블을 붙이는게 가장 많다
---1에 N을 붙임
+--일반적으로 N테이블(FK KEY)에 1테이블을 붙이는게 가장 많다
+--1(PK KEY)에 N을 붙임
 SELECT * FROM DEPARTMENTS D INNER JOIN EMPLOYEES E ON D.DEPARTMENT_ID = E.DEPARTMENT_ID;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
