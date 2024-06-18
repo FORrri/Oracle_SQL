@@ -206,19 +206,123 @@ ON A.DEPARTMENT_ID = D.DEPARTMENT_ID;
 --조건) 인원수 기준 내림차순 정렬하세요.
 --조건) 사람이 없는 부서는 출력하지 뽑지 않습니다.
 --한트) 부서의 인원수 먼저 구한다. 이 테이블을 조인한다.
---
+
+SELECT * 
+FROM DEPARTMENTS D
+JOIN (
+    SELECT COUNT(*) AS 사원수,
+            DEPARTMENT_ID
+    FROM EMPLOYEES
+    GROUP BY DEPARTMENT_ID
+    )E
+ON D.DEPARTMENT_ID = E.DEPARTMENT_ID;
+
+    SELECT COUNT(*) AS 사원수,
+            DEPARTMENT_ID
+    FROM EMPLOYEES
+    GROUP BY DEPARTMENT_ID;
+    
+--위에꺼랑 뭐가 다른지 체크해볼것
+SELECT * 
+FROM(SELECT COUNT(*) AS 사원수,
+            DEPARTMENT_ID
+    FROM EMPLOYEES
+    GROUP BY DEPARTMENT_ID) E
+LEFT JOIN DEPARTMENTS D
+ON D.DEPARTMENT_ID = E.DEPARTMENT_ID;
+
 --문제15
 --부서에 모든 컬럼, 주소, 우편번호, 부서별 평균 연봉을 구해서 출력하세요.
 --조건) 부서별 평균이 없으면 0으로 출력하세요
+
+SELECT * FROM DEPARTMENTS;
+SELECT * FROM LOCATIONS;
+
+--부서별 평균연봉
+SELECT TRUNC(AVG(SALARY)) AS 평균연봉,
+        DEPARTMENT_ID
+FROM EMPLOYEES
+GROUP BY DEPARTMENT_ID;
+
 --
+SELECT D.*,
+        L.STREET_ADDRESS,
+        L.POSTAL_CODE,
+        E.평균연봉
+FROM DEPARTMENTS D
+JOIN ( SELECT TRUNC( NVL(AVG(SALARY),0 )) AS 평균연봉,
+                DEPARTMENT_ID
+        FROM EMPLOYEES
+        GROUP BY DEPARTMENT_ID ) E
+ON D.DEPARTMENT_ID = E.DEPARTMENT_ID
+LEFT JOIN LOCATIONS L
+ON D.LOCATION_ID = L.LOCATION_ID;
+
+
 --문제16
 --문제 15결과에 대해 DEPARTMENT_ID기준으로 내림차순 정렬해서 ROWNUM을 붙여 1-10데이터 까지만
 --출력하세요
 
+SELECT D.*,
+        L.STREET_ADDRESS,
+        L.POSTAL_CODE,
+        E.평균연봉
+FROM DEPARTMENTS D
+JOIN ( SELECT TRUNC( NVL(AVG(SALARY),0 )) AS 평균연봉,
+                DEPARTMENT_ID
+        FROM EMPLOYEES
+        GROUP BY DEPARTMENT_ID ) E --부서가 없는 사람은 안붙음
+ON D.DEPARTMENT_ID = E.DEPARTMENT_ID
+LEFT JOIN LOCATIONS L
+ON D.LOCATION_ID = L.LOCATION_ID
+ORDER BY D.DEPARTMENT_ID DESC;
 
+--
+SELECT ROWNUM AS RN,
+        D.DEPARTMENT_ID,
+        DEPARTMENT_NAME,
+        MANAGER_ID,
+        LOCATION_ID,
+        STREET_ADDRESS,
+        POSTAL_CODE,
+        평균연봉
+FROM (
+    SELECT D.*,
+         L.STREET_ADDRESS,
+         L.POSTAL_CODE,
+         E.평균연봉
+    FROM DEPARTMENTS D
+    JOIN ( SELECT TRUNC( NVL(AVG(SALARY),0 )) AS 평균연봉,
+                    DEPARTMENT_ID
+         FROM EMPLOYEES
+            GROUP BY DEPARTMENT_ID ) E --부서가 없는 사람은 안붙음
+    ON D.DEPARTMENT_ID = E.DEPARTMENT_ID
+    LEFT JOIN LOCATIONS L
+    ON D.LOCATION_ID = L.LOCATION_ID
+    ORDER BY D.DEPARTMENT_ID DESC );
 
-
-
+--
+SELECT *
+FROM (
+SELECT *
+FROM (
+    SELECT D.*,
+         L.STREET_ADDRESS,
+         L.POSTAL_CODE,
+         E.평균연봉,
+         ROWNUM AS RN
+    FROM DEPARTMENTS D
+    JOIN ( SELECT TRUNC( NVL(AVG(SALARY),0 )) AS 평균연봉,
+                    DEPARTMENT_ID
+         FROM EMPLOYEES
+            GROUP BY DEPARTMENT_ID ) E 
+    ON D.DEPARTMENT_ID = E.DEPARTMENT_ID
+    LEFT JOIN LOCATIONS L
+    ON D.LOCATION_ID = L.LOCATION_ID
+    ORDER BY D.DEPARTMENT_ID DESC 
+    )
+)
+WHERE RN >= 1 AND RN <= 10;
 
 
 
